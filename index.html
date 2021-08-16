@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=1280">
+</head>
+
+<style>
+    .container {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: 0;
+        color: #fff;
+        background: #000;
+    }
+</style>
+
+<body class="container">
+    <div id="player"></div>
+
+    <script>
+        var PLAYER_CALLBACK = {
+            playVideo: 'playVideo',
+            pauseVideo: 'pauseVideo',
+            stopVideo: 'stopVideo',
+            seekTo: 'seekTo',
+            getCurrentTime: 'getCurrentTime',
+            getDuration: 'getDuration',
+        };
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+            var results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                width: '100%',
+                height: '100%',
+                videoId: videoId,
+                playerVars: {
+                    autoplay: 0,
+                    controls: 0,
+                    enablejsapi: 1,
+                    iv_load_policy: 3,
+                    modestbranding: 1,
+                    rel: 0,
+                    playsinline: 1,
+                },
+                events: {
+                    onStateChange: onPlayerStateChange,
+                    onError: onPlayerError,
+                    onReady: onPlayerReady,
+                }
+            });
+        }
+        	
+        function handleReactNativeMessage (event) {
+	      try {
+	        var data = JSON.parse(event.data);
+	        var method = data.method;
+	        var payload = data.payload;
+	        handleRNEvent(method, payload);
+	      } catch (err) {
+	        console.warn(err);
+	      }
+	    }
+
+        function handleRNEvent(method, payload) {
+            switch (method) {
+                case PLAYER_CALLBACK.playVideo:
+                    playVideo();
+                    break;
+                case PLAYER_CALLBACK.pauseVideo:
+                    pauseVideo();
+                    break;
+                case PLAYER_CALLBACK.stopVideo:
+                    stopVideo();
+                    break;
+                case PLAYER_CALLBACK.getCurrentTime:
+                    getCurrentTime();
+                    break;
+                case PLAYER_CALLBACK.getDuration:
+                    getDuration();
+                    break;
+                case PLAYER_CALLBACK.seekTo:
+                    seekTo(payload);
+                    break;
+            }
+        }
+
+        function sendMessageToReactNative(method, payload) {
+            var msg = JSON.stringify({
+                id: new Date().getTime(),
+                method,
+                payload,
+            });
+
+            if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage(msg);
+            }
+        }
+
+        function onPlayerStateChange(event) {
+            window.ReactNativeWebView.postMessage("onPlayerStateChange_" + JSON.stringify(event.data))
+        }
+
+        function onPlayerReady(event) {
+            window.ReactNativeWebView.postMessage("onPlayerReady_");
+
+            // walk around: avoiding to the Buffering state forever resulted by executing seekTo() at the first time.
+            // seekTo(0); 
+
+            // walk around: RN webview postMessage cannot immediately exectue when iframe set up.
+            // setTimeout(() => { 
+            //   window.postMessage("onPlayerReady_")       
+            // }, 300);
+        }
+
+        function onPlayerError(event) {
+            window.ReactNativeWebView.postMessage("onPlayerError_" + JSON.stringify(event.data))
+        }
+
+        function playVideo() {
+            player.playVideo();
+        }
+
+        function pauseVideo() {
+            player.pauseVideo();
+        }
+
+        function stopVideo() {
+            player.stopVideo();
+        }
+
+        function seekTo(seconds) {
+            player.seekTo(seconds, true);
+            window.ReactNativeWebView.postMessage("seekTo_" + seconds)
+        }
+
+        function getCurrentTime() {
+            var time = player.getCurrentTime();
+            window.ReactNativeWebView.postMessage("getCurrentTime_" + JSON.stringify(time))
+        }
+
+        function getDuration() {
+            var time = player.getDuration();
+            window.ReactNativeWebView.postMessage("getDuration_" + JSON.stringify(time))
+        }
+
+        var videoId = getParameterByName('video_id');
+
+        var player;
+        var tag = document.createElement('script');
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+
+        tag.src = 'https://www.youtube.com/iframe_api';
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    </script>
+</body>
+
+</html>
