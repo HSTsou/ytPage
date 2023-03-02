@@ -32,15 +32,21 @@
 </form>
 
 <script>
-function myFunction() {
-  document.getElementById("myCheck").click();
-setTimeout(function() {
-location.href = "com.nineyi.shop.s040358.scheme.module://hotsale";
-}, 3000);
-// 	alert("oo")
-//   location.href = "com.nineyi.shop.s040358.scheme.module://hotsale";
-}
-	 myFunction()
+// function myFunction() {
+//   document.getElementById("myCheck").click();
+// setTimeout(function() {
+// location.href = "com.nineyi.shop.s040358.scheme.module://hotsale";
+// }, 3000);
+// // 	alert("oo")
+// //   location.href = "com.nineyi.shop.s040358.scheme.module://hotsale";
+// }
+// 	 myFunction()
+	
+	(() => {
+	 setTimeout(function() {
+		location.href = "com.nineyi.shop.s040358.scheme.module://hotsale";
+	}, 3000);
+	 })()
 </script>
     <div id="player"></div>
 
