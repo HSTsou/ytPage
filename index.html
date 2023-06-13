@@ -103,24 +103,24 @@
             }
         }
 
-        function sendMessageToReactNative(method, payload) {
+        function sendMessageToNative(method, payload) {
             var msg = JSON.stringify({
                 id: new Date().getTime(),
                 method,
                 payload,
             });
 
-            if (window.ReactNativeWebView) {
-                window.ReactNativeWebView.postMessage(msg);
+            if (window.NativeWebView) {
+                window.NativeWebView.postMessage(msg);
             }
         }
 
         function onPlayerStateChange(event) {
-            window.ReactNativeWebView.postMessage("onPlayerStateChange_" + JSON.stringify(event.data))
+            window.NativeWebView.postMessage("onPlayerStateChange_" + JSON.stringify(event.data))
         }
 
         function onPlayerReady(event) {
-            window.ReactNativeWebView.postMessage("onPlayerReady_");
+            window.NativeWebView.postMessage("onPlayerReady_");
 
             // walk around: avoiding to the Buffering state forever resulted by executing seekTo() at the first time.
             // seekTo(0); 
@@ -132,7 +132,7 @@
         }
 
         function onPlayerError(event) {
-            window.ReactNativeWebView.postMessage("onPlayerError_" + JSON.stringify(event.data))
+            window.NativeWebView.postMessage("onPlayerError_" + JSON.stringify(event.data))
         }
 
         function playVideo() {
@@ -149,17 +149,17 @@
 
         function seekTo(seconds) {
             player.seekTo(seconds, true);
-            window.ReactNativeWebView.postMessage("seekTo_" + seconds)
+            window.NativeWebView.postMessage("seekTo_" + seconds)
         }
 
         function getCurrentTime() {
             var time = player.getCurrentTime();
-            window.ReactNativeWebView.postMessage("getCurrentTime_" + JSON.stringify(time))
+            window.NativeWebView.postMessage("getCurrentTime_" + JSON.stringify(time))
         }
 
         function getDuration() {
             var time = player.getDuration();
-            window.ReactNativeWebView.postMessage("getDuration_" + JSON.stringify(time))
+            window.NativeWebView.postMessage("getDuration_" + JSON.stringify(time))
         }
 
         var videoId = getParameterByName('video_id');
