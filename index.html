@@ -69,18 +69,18 @@
             });
         }
         	
-        function handleReactNativeMessage (event) {
+        function handleNativeMessage (event) {
 	      try {
 	        var data = JSON.parse(event.data);
 	        var method = data.method;
 	        var payload = data.payload;
-	        handleRNEvent(method, payload);
+	        handleEvent(method, payload);
 	      } catch (err) {
 	        console.warn(err);
 	      }
 	    }
 
-        function handleRNEvent(method, payload) {
+        function handleEvent(method, payload) {
             switch (method) {
                 case PLAYER_CALLBACK.playVideo:
                     playVideo();
